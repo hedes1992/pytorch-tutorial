@@ -1,8 +1,10 @@
+#coding=utf-8
 import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+import pdb
 
 # Hyper-parameters 
 input_size = 784
@@ -12,7 +14,8 @@ batch_size = 100
 learning_rate = 0.001
 
 # MNIST dataset (images and labels)
-train_dataset = torchvision.datasets.MNIST(root='../../data', 
+# 这里不采用cuda device
+train_dataset = torchvision.datasets.MNIST(root='../../../data', 
                                            train=True, 
                                            transform=transforms.ToTensor(),
                                            download=True)
@@ -36,6 +39,7 @@ model = nn.Linear(input_size, num_classes)
 # Loss and optimizer
 # nn.CrossEntropyLoss() computes softmax internally
 criterion = nn.CrossEntropyLoss()  
+# 跟feedforward_networks中的优化器不同
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)  
 
 # Train the model
@@ -68,7 +72,8 @@ with torch.no_grad():
         outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
-        correct += (predicted == labels).sum()
+#        correct += (predicted == labels).sum()
+        correct += (predicted == labels).sum().item()
 
     print('Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
 

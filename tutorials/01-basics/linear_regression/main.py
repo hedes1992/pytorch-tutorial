@@ -1,8 +1,10 @@
+#coding=utf-8
 import torch
 import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 
+import pdb
 
 # Hyper-parameters
 input_size = 1
@@ -45,11 +47,13 @@ for epoch in range(num_epochs):
         print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
 
 # Plot the graph
+# detach 函数返回新的tensor, 从当前graphdetach, 不需要梯度
 predicted = model(torch.from_numpy(x_train)).detach().numpy()
 plt.plot(x_train, y_train, 'ro', label='Original data')
 plt.plot(x_train, predicted, label='Fitted line')
 plt.legend()
-plt.show()
+#plt.show()
+plt.savefig('linear_res.jpg')
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')

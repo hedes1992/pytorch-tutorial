@@ -1,11 +1,16 @@
+#coding=utf-8
 import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
+import pdb
 
 # Device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# 优先使用gpu-3 
+device = torch.device('cuda:3,2,1' if torch.cuda.is_available() else 'cpu')
+# 默认使用gpu-0
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyper-parameters 
 input_size = 784
@@ -16,7 +21,7 @@ batch_size = 100
 learning_rate = 0.001
 
 # MNIST dataset 
-train_dataset = torchvision.datasets.MNIST(root='../../data', 
+train_dataset = torchvision.datasets.MNIST(root='../../../data', 
                                            train=True, 
                                            transform=transforms.ToTensor(),  
                                            download=True)
@@ -51,6 +56,7 @@ class NeuralNet(nn.Module):
 model = NeuralNet(input_size, hidden_size, num_classes).to(device)
 
 # Loss and optimizer
+# 默认的loss是reduce_mean的
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
 
@@ -73,7 +79,7 @@ for epoch in range(num_epochs):
         
         if (i+1) % 100 == 0:
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))#item() 是将tensor对象转化为python数字, 例如tolist()是转化为python list
 
 # Test the model
 # In test phase, we don't need to compute gradients (for memory efficiency)
@@ -84,6 +90,7 @@ with torch.no_grad():
         images = images.reshape(-1, 28*28).to(device)
         labels = labels.to(device)
         outputs = model(images)
+        #在第一维即类别维度上取max, 返回的第一项是最大的值, 返回的第二项是最大值的index
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
